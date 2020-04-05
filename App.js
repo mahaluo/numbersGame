@@ -6,7 +6,8 @@ export default class Game extends Component {
     secret : 0,
     input: '',
     inputDisplay: '',
-    feedback: ''
+    feedback: '',
+    userChances: 5
   }
 
   //generate random number function
@@ -16,8 +17,22 @@ export default class Game extends Component {
 
   //initialize game function
   init() {
+    const userChances = 5;
     const secretNumber = this.generateRandom()
+    const userGuesses = this.state.userChances;
+
+    if (userGuesses == 5) {
+      this.setState({ feedback: 'New game started!'})
+    }
+    else if (userGuesses == 1) {
+      this.setState({ feedback: 'You Lost!'})
+    }
+    else {
+      this.setState({ feedback: 'You Win!'})
+    }
+
     this.setState({ secret: secretNumber })
+    this.setState({ userChances: userChances})
   }
 
   
@@ -27,43 +42,65 @@ export default class Game extends Component {
   }
 
   //update input state function
-  updateInput = (value) => { this.setState({ input: value })}
+  updateInput = (value) => { 
+    this.setState({ input: value })
+  }
+
+  userGuesses = () => {
+    //get users chances
+    const userChances = this.state.userChances;
+    this.setState({ userChances: userChances - 1})
+  }
 
   //compare users guess function
   checkGuess = () => {
-    //store inout in userGuess before clearing
-    const userGuess = parseInt(this.state.input);
-    //clear the input
-    this.setState({input: ''})
-    //store the secret in secretNumber
-    const secretNumber = this.state.secret;
-    //see if answer is right
-    if (userGuess == secretNumber) {
-      this.setState({ feedback: 'You guessed right!' + secretNumber})
-      this.init()
+
+    this.userGuesses();
+    const userChances = this.state.userChances;
+    if (userChances == 1) {
+      this.init();
       return
     }
-    //see if answer is smaller
-    if (userGuess < secretNumber) {
-      this.setState({ feedback: 'The number is larger than: ' + userGuess})
-      return
-    }
-    //see if answer is larger
-    if (userGuess > secretNumber) {
-      this.setState({ feedback: 'The number is smaller than: ' + userGuess})
-      return
+    else {
+      //store inout in userGuess before clearing
+      const userGuess = parseInt(this.state.input);
+     
+      //clear the input
+      this.setState({input: ''})
+      //store the secret in secretNumber
+      const secretNumber = this.state.secret;
+      //see if answer is right
+      if (userGuess == secretNumber) {
+        this.setState({ feedback: 'You Win!'})
+        this.init()
+        return
+      }
+      //see if answer is smaller
+      if (userGuess < secretNumber) {
+        this.setState({ feedback: 'The number is larger than: ' + userGuess})
+        return
+      }
+      //see if answer is larger
+      if (userGuess > secretNumber) {
+        this.setState({ feedback: 'The number is smaller than: ' + userGuess})
+        return
+      } 
     }
   }
 
   render() {
     return (
       <View style={styles.container}>
+
+          
+
         <View style={styles.game}>
+        <Text style={styles.title}> You have: {this.state.userChances} guesses left! </Text>
           <Text style={styles.title}>Guess my number!</Text>
 
           <TextInput
           style={styles.input}
-          keyboardType='number-pad'
+          keyboardType='numeric'
           onChangeText={this.updateInput}
           value={this.state.input}
           onSubmitEditing={this.checkGuess}>
@@ -73,14 +110,18 @@ export default class Game extends Component {
           style={styles.button}
           underlayColor='white'
           onPress={this.checkGuess}>
+
             <Text>Submit Guess</Text>
           </TouchableHighlight>
+
+
           <Text style={styles.feedback}>{this.state.feedback}</Text>
+
+
         </View>
       </View>
     )
   }
-
 }
 
 const styles = StyleSheet.create({
