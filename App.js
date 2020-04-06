@@ -7,7 +7,8 @@ export default class Game extends Component {
     input: '',
     inputDisplay: '',
     feedback: '',
-    userChances: 5
+    userChances: 5,
+    guessButton: ''
   }
 
   //generate random number function
@@ -20,19 +21,25 @@ export default class Game extends Component {
     const userChances = 5;
     const secretNumber = this.generateRandom()
     const userGuesses = this.state.userChances;
+    let guessButton = this.state.guessButton;
 
     if (userGuesses == 5) {
       this.setState({ feedback: 'New game started!'})
+      this.setState({ guessButton: 'First guess'})
     }
     else if (userGuesses == 1) {
       this.setState({ feedback: 'You Lost!'})
+      this.setState({ guessButton: 'First guess'})
+   
     }
     else {
       this.setState({ feedback: 'You Win!'})
+      this.setState({ guessButton: 'First guess'})
     }
 
     this.setState({ secret: secretNumber })
     this.setState({ userChances: userChances})
+    
   }
 
   
@@ -64,7 +71,7 @@ export default class Game extends Component {
     else {
       //store inout in userGuess before clearing
       const userGuess = parseInt(this.state.input);
-     
+      this.setState({ guessButton: 'Submit guess'});
       //clear the input
       this.setState({input: ''})
       //store the secret in secretNumber
@@ -111,7 +118,7 @@ export default class Game extends Component {
           underlayColor='white'
           onPress={this.checkGuess}>
 
-            <Text>Submit Guess</Text>
+          <Text>{this.state.guessButton}</Text>
           </TouchableHighlight>
 
 
